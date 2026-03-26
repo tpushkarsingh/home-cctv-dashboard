@@ -3,6 +3,7 @@
 [![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://reactjs.org/)
 [![MediaMTX](https://img.shields.io/badge/MediaMTX-v1.17-blue)](https://github.com/bluenviron/mediamtx)
+![App Demo](./public/app_demo.gif)
 
 Stop switching between five different apps just to see what’s happening around your house. **Universal Camera Viewer** is a simple, unified dashboard that brings all your home monitoring cameras (TP-Link, Dahua, Hikvision, etc.) into a single library in your web browser.
 
