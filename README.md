@@ -12,6 +12,33 @@ I built this because I purchased several different brands of home monitoring cam
 
 This project is an open-source solution for anyone facing the same challenge. It takes the "tech talk" (like RTSP and HLS) and handles it in the background so you can just focus on seeing your home.
 
+## 📖 How to Use
+
+Once you have the app running, follow these simple steps to start viewing your cameras:
+
+1.  **Open the App**: Go to [http://localhost:3000](http://localhost:3000) in your web browser. You'll see the main dashboard where your camera feeds will appear.
+    ![Dashboard Overview](./public/cam_dashboard.png)
+
+2.  **Go to Settings**: Click on the **Settings** tab. This is where you configure your camera streams.
+    ![Settings Configuration](./public/Setting.png)
+
+3.  **Find Your Camera Details**: If you're using a common brand (like those found on a "Spy" camera website), you'll need the IP address and the RTSP path.
+    ![Camera Home Example](./public/spycam_home.png)
+    ![Camera Details Example](./public/spycam.png)
+
+4.  **Add Your Cameras**:
+    *   **Name**: A nickname for the camera (e.g., "Front Door").
+    *   **IP Address**: The camera's local IP (e.g., `192.168.1.10`).
+    *   **Username/Password**: Your camera credentials.
+    *   **RTSP Path**: Often `/stream1` or `/live`. 
+
+5.  **Save and View**: Click **Add Camera**. The app will automatically connect in the background. Navigate back to the **Dashboard** to see your live stream!
+
+### ⚙️ Under the Hood: MediaMTX Config
+For those who want to tweak the streaming engine, its configuration is in `mediamtx.yml`:
+*   **API Management**: Port `9997` (Admin: `admin:admin`)
+*   **Video Streams**: Port `8888`
+
 ## 🚀 How It Works
 
 - **Unified Dashboard**: See all your cameras (regardless of the brand) in one grid.
@@ -25,6 +52,37 @@ This project is an open-source solution for anyone facing the same challenge. It
 - **Auto-Sync**: The dashboard talks to the streaming engine for you.
 
 ## 🛠 Behind the Scenes
+
+### 🏗 Architecture Diagram
+
+Here’s how the data flows from your cameras to your screen:
+
+```mermaid
+graph TD
+    subgraph "Your Home Network"
+        Cam1[Camera 1: RTSP] 
+        Cam2[Camera 2: RTSP]
+        Cam3[Camera N: RTSP]
+    end
+
+    subgraph "Docker Container: MediaMTX"
+        Ingest[RTSP Ingester]
+        Trans[HLS Repackager]
+        API[REST API v3]
+        HLS_Server[HLS HTTP Server: 8888]
+    end
+
+    subgraph "Docker Container: Frontend"
+        Dashboard[React Dashboard: 3000]
+    end
+
+    Cam1 & Cam2 & Cam3 -->|RTSP Stream| Ingest
+    Ingest --> Trans
+    Trans -->|index.m3u8 + segments| HLS_Server
+    Dashboard -->|1. Sync Paths / Auth| API
+    API -.->|Update Config| Ingest
+    HLS_Server -->|2. Play Stream| Dashboard
+```
 
 ### 🏗 How It Works (Technical Deep Dive)
 
@@ -66,32 +124,6 @@ To solve this, we use a process called **RTSP-to-HLS Transformation**:
 3. **Access the Dashboard**:
    Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 📖 How to Use
-
-Once you have the app running, follow these simple steps to start viewing your cameras:
-
-1.  **Open the App**: Go to [http://localhost:3000](http://localhost:3000) in your web browser. You'll see the main dashboard where your camera feeds will appear.
-    ![Dashboard Overview](./public/cam_dashboard.png)
-
-2.  **Go to Settings**: Click on the **Settings** tab. This is where you configure your camera streams.
-    ![Settings Configuration](./public/Setting.png)
-
-3.  **Find Your Camera Details**: If you're using a common brand (like those found on a "Spy" camera website), you'll need the IP address and the RTSP path.
-    ![Camera Home Example](./public/spycam_home.png)
-    ![Camera Details Example](./public/spycam.png)
-
-4.  **Add Your Cameras**:
-    *   **Name**: A nickname for the camera (e.g., "Front Door").
-    *   **IP Address**: The camera's local IP (e.g., `192.168.1.10`).
-    *   **Username/Password**: Your camera credentials.
-    *   **RTSP Path**: Often `/stream1` or `/live`. 
-
-5.  **Save and View**: Click **Add Camera**. The app will automatically connect in the background. Navigate back to the **Dashboard** to see your live stream!
-
-### ⚙️ Under the Hood: MediaMTX Config
-For those who want to tweak the streaming engine, its configuration is in `mediamtx.yml`:
-*   **API Management**: Port `9997` (Admin: `admin:admin`)
-*   **Video Streams**: Port `8888`
 
 ## 🛡 Security Note
 
