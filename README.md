@@ -1,70 +1,104 @@
-# Getting Started with Create React App
+# 🎥 Universal Camera Viewer
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://reactjs.org/)
+[![MediaMTX](https://img.shields.io/badge/MediaMTX-v1.17-blue)](https://github.com/bluenviron/mediamtx)
 
-## Available Scripts
+Stop switching between five different apps just to see what’s happening around your house. **Universal Camera Viewer** is a simple, unified dashboard that brings all your home monitoring cameras (TP-Link, Dahua, Hikvision, etc.) into a single library in your web browser.
 
-In the project directory, you can run:
+## 🏠 Why This Project?
 
-### `npm start`
+I built this because I purchased several different brands of home monitoring cameras, only to find that **each one required its own separate app**. There was no single place to see all my cameras at once.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+This project is an open-source solution for anyone facing the same challenge. It takes the "tech talk" (like RTSP and HLS) and handles it in the background so you can just focus on seeing your home.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🚀 How It Works
 
-### `npm test`
+- **Unified Dashboard**: See all your cameras (regardless of the brand) in one grid.
+- **Easy Setup**: Add a camera's IP address and credentials in the settings, and it appears instantly.
+- **Works in Your Browser**: No need to install multiple apps on your phone or computer.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## ✨ Features
 
-### `npm run build`
+- **Live Grid Layout**: View multiple camera streams simultaneously.
+- **Dynamic Configuration**: Add, edit, or remove cameras directly from the UI settings.
+- **Auto-Sync**: The dashboard talks to the streaming engine for you.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🛠 Behind the Scenes
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 🏗 How It Works (Technical Deep Dive)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Most security cameras use **RTSP (Real Time Streaming Protocol)**. It’s excellent for low-latency streaming between hardware (like a camera to a DVR), but it **cannot be played directly in a web browser.**
 
-### `npm run eject`
+To solve this, we use a process called **RTSP-to-HLS Transformation**:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1.  **RTSP Ingestion**: **MediaMTX** (our streaming engine) connects to your camera's RTSP URL (e.g., `rtsp://admin:pass@192.168.1.50/stream1`) and pulls the raw video data.
+2.  **HLS Packeting**: MediaMTX "chops" that continuous video stream into small, 1-second chunks (called segments, often `.ts` files).
+3.  **The Playlist (`.m3u8`)**: It creates a master index file called `index.m3u8`. This file is essentially a text-based playlist that tells the browser exactly which small video chunk to play next to keep the stream going.
+4.  **HTTP Serving**: These small video files are served over standard HTTP (port `8888`), making them look just like regular web files to your browser.
+5.  **Frontend Playback**: The **React Dashboard** uses a library called `HLS.js`. It fetches the `.m3u8` playlist, downloads the segments one by one, and plays them seamlessly in a standard HTML5 `<video>` tag.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 🧩 Tech Stack
+- **Frontend**: React 18 with CSS Glassmorphism for a premium look.
+- **Streaming Engine**: [MediaMTX](https://github.com/bluenviron/mediamtx) — a high-performance, lightweight server for RTSP, RTMP, and HLS.
+- **Containerization**: Everything runs in **Docker**, so you don't have to worry about installing dependencies on your host machine.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 📦 Getting Started
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Prerequisites
 
-## Learn More
+- [Docker](https://www.docker.com/products/docker-desktop/) installed on your machine.
+- [Docker Compose](https://docs.docker.com/compose/install/) (included with Docker Desktop).
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Installation
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+1. **Clone the repository**:
+   ```bash
+   git clone <your-repo-url>
+   cd cam-viewer-home
+   ```
 
-### Code Splitting
+2. **Start the application**:
+   ```bash
+   docker-compose up --build -d
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+3. **Access the Dashboard**:
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Analyzing the Bundle Size
+## 📖 How to Use
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Once you have the app running, follow these simple steps to start viewing your cameras:
 
-### Making a Progressive Web App
+1.  **Open the App**: Go to [http://localhost:3000](http://localhost:3000) in your web browser. You'll see the main dashboard where your camera feeds will appear.
+    ![Dashboard Overview](./public/cam_dashboard.png)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+2.  **Go to Settings**: Click on the **Settings** tab. This is where you configure your camera streams.
+    ![Settings Configuration](./public/Setting.png)
 
-### Advanced Configuration
+3.  **Find Your Camera Details**: If you're using a common brand (like those found on a "Spy" camera website), you'll need the IP address and the RTSP path.
+    ![Camera Home Example](./public/spycam_home.png)
+    ![Camera Details Example](./public/spycam.png)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+4.  **Add Your Cameras**:
+    *   **Name**: A nickname for the camera (e.g., "Front Door").
+    *   **IP Address**: The camera's local IP (e.g., `192.168.1.10`).
+    *   **Username/Password**: Your camera credentials.
+    *   **RTSP Path**: Often `/stream1` or `/live`. 
 
-### Deployment
+5.  **Save and View**: Click **Add Camera**. The app will automatically connect in the background. Navigate back to the **Dashboard** to see your live stream!
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### ⚙️ Under the Hood: MediaMTX Config
+For those who want to tweak the streaming engine, its configuration is in `mediamtx.yml`:
+*   **API Management**: Port `9997` (Admin: `admin:admin`)
+*   **Video Streams**: Port `8888`
 
-### `npm run build` fails to minify
+## 🛡 Security Note
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This setup is intended for **local network use**. If you plan to expose this to the internet, please:
+- Change the `admin` password in `mediamtx.yml` and `mediaMtxApi.js`.
+- Use a reverse proxy (like Nginx/Traefik) with SSL (HTTPS).
+- Enable authentication for the `read` action in `mediamtx.yml`.
+
+---
+Made with ❤️ for smart home enthusiasts.

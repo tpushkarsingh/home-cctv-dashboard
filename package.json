@@ -7,13 +7,17 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^13.5.0",
+    "hls.js": "^1.6.15",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "clean-mac": "find . -name '._*' -type f -delete",
+    "prestart": "npm run clean-mac",
+    "start": "HOST=0.0.0.0 concurrently \"npm run mediamtx\" \"react-scripts start\"",
+    "mediamtx": "mediamtx mediamtx.yml",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -35,5 +39,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }

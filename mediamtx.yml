@@ -1,0 +1,27 @@
+logLevel: debug
+rtspTransports: [tcp]
+hlsAllowOrigins: [ '*' ]
+hlsAlwaysRemux: yes
+api: yes
+apiAddress: :9997
+
+authMethod: internal
+authInternalUsers:
+- user: admin
+  pass: admin
+  ips: ['0.0.0.0/0']
+  permissions:
+  - action: publish
+  - action: read
+  - action: api
+- user: any
+  pass: ""
+  ips: ['0.0.0.0/0']
+  permissions:
+  - action: read
+
+# All paths are now managed dynamically via the REST API from the frontend
+paths:
+  all:
+    # Optional: default settings for all paths
+    rtspTransport: tcp
